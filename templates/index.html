@@ -28,7 +28,7 @@
             font-size: 3.5rem;
             font-weight: 800;
             color: #2c3e50;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
             animation: fadeInDown 1s ease-out;
@@ -56,6 +56,32 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #3498db;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input:focus {
+            border-color: #2980b9;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
         /* 无序列表样式 */
@@ -117,18 +143,18 @@
         }
 
         /* 链接内部图标样式 */
-      .icon {
+        .icon {
             font-size: 3rem;
             margin-bottom: 1rem;
             transition: color 0.3s ease;
         }
 
-        a:hover.icon {
+        a:hover .icon {
             color: white;
         }
 
         /* 链接内部文字样式 */
-      .title {
+        .title {
             font-size: 1.2rem;
             font-weight: 600;
             text-align: center;
@@ -137,7 +163,7 @@
         }
 
         /* 文件上传表单样式 */
-      .upload-form {
+        .upload-form {
             background: white;
             padding: 20px;
             border-radius: 8px;
@@ -149,7 +175,7 @@
         }
 
         /* 自定义文件选择按钮样式 */
-      .custom-file-label {
+        .custom-file-label {
             position: relative;
             display: inline-block;
             cursor: pointer;
@@ -183,7 +209,7 @@
         }
 
         /* 上传按钮样式 */
-      .upload-form input[type="submit"] {
+        .upload-form input[type="submit"] {
             background-color: #3498db;
             color: white;
             padding: 15px 30px;
@@ -195,18 +221,18 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-       .upload-form input[type="submit"]:hover {
+        .upload-form input[type="submit"]:hover {
             background-color: #2980b9;
         }
 
         /* 禁用状态下的上传按钮样式 */
-      .upload-form input[type="submit"]:disabled {
+        .upload-form input[type="submit"]:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
 
         /* 密钥选择样式 */
-      .key-container {
+        .key-container {
             display: none;
             flex-wrap: wrap;
             justify-content: center;
@@ -214,7 +240,7 @@
             margin-top: 15px;
         }
 
-      .key-option {
+        .key-option {
             background-color: #f0f0f0;
             padding: 10px 20px;
             border-radius: 5px;
@@ -222,11 +248,11 @@
             transition: background-color 0.3s ease;
         }
 
-      .key-option:hover {
+        .key-option:hover {
             background-color: #e0e0e0;
         }
 
-      .key-option.selected {
+        .key-option.selected {
             background-color: #3498db;
             color: white;
         }
@@ -246,7 +272,10 @@
         </div>
     </form>
     <h1>Archive</h1>
-    <ul>
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a magazine...">
+    </div>
+    <ul id="pdf-list">
         {% for file in uploaded_files %}
         <li>
             <a href="{{ url_for('static', filename='uploads/' + file) }}" target="_blank" class="pdf-link">
@@ -261,7 +290,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const error = "{{ error }}";
-            if (error && error!="None") {
+            if (error && error != "None") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -269,6 +298,22 @@
                     confirmButtonColor: '#3498db'
                 });
             }
+
+            // 从 URL 获取搜索参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get("search") || "";
+
+            // 设置搜索框的初始值
+            const searchInput = document.getElementById('search-input');
+            searchInput.value = searchQuery;
+
+            // 初始加载时根据 URL 参数过滤
+            filterAndDisplayPDFs(searchQuery);
+
+            // 监听搜索框输入事件
+            searchInput.addEventListener('input', (e) => {
+                filterAndDisplayPDFs(e.target.value);
+            });
         });
 
         function handleFileSelection() {
@@ -317,8 +362,22 @@
                 });
             }
         });
-    </script>
-    <script>
+
+        // 过滤并显示 PDF 文件
+        function filterAndDisplayPDFs(query) {
+            const pdfList = document.getElementById('pdf-list');
+            const pdfLinks = document.querySelectorAll('.pdf-link');
+
+            pdfLinks.forEach(link => {
+                const title = link.querySelector('.title').textContent.toLowerCase();
+                if (title.includes(query.toLowerCase())) {
+                    link.parentElement.style.display = 'block';
+                } else {
+                    link.parentElement.style.display = 'none';
+                }
+            });
+        }
+
         function get_file_icon_class(file) {
             const ext = file.split('.').pop().toLowerCase();
             switch (ext) {
