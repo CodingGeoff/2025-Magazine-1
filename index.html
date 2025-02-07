@@ -70,6 +70,20 @@
         align-items: center;
         width: 100%;
         max-width: 600px;
+        position: relative;
+        animation: slideInUp 1s ease-out;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .search-input {
@@ -81,11 +95,22 @@
         outline: none;
         transition: all 0.3s ease;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding-right: 40px;
       }
 
       .search-input:focus {
         border-color: #2980b9;
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        color: #3498db;
+        pointer-events: none;
       }
 
       /* 无序列表样式 */
@@ -148,8 +173,8 @@
 
       /* 链接内部图标样式 */
       .icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
         transition: color 0.3s ease;
       }
 
@@ -177,6 +202,7 @@
         class="search-input"
         placeholder="Search for a magazine..."
       />
+      <i class="search-icon fa-solid fa-magnifying-glass"></i>
     </div>
     <ul id="pdf-list"></ul>
 
@@ -216,24 +242,12 @@
       const pdfFiles = [
         "Artforum 02 2025.pdf",
         "Canadian Living 03 2025.pdf",
+        "Computeractive 12 02 2025.pdf",
         "FORTUNE EU 02 03 2025.pdf",
         "Kitchen Bath Design News 01 02 2025.pdf",
         "Model Airplane News 03 04 2025.pdf",
         "Sports Illustrated National Champions Commemorative 2025.pdf",
       ];
-
-      //注意和 magazine 部分的格式不一样
-      /*
-      const magazines = {
-          "2025-Magazine-1": [
-            "Artforum 02 2025.pdf",
-            "Canadian Living 03 2025.pdf",
-            "Kitchen Bath Design News 01 02 2025.pdf",
-            "Model Airplane News 03 04 2025.pdf",
-            "Sports Illustrated National Champions Commemorative 2025.pdf",
-          ],
-        };
-      */
 
       const pdfList = document.getElementById("pdf-list");
       const searchInput = document.getElementById("search-input");
