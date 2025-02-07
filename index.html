@@ -1,301 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Free magazine archive</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <style>
-      /* 全局样式 */
-      body {
-        font-family: "Montserrat", sans-serif;
-        background: linear-gradient(135deg, #f4f4f9 0%, #e0e0e9 100%);
-        padding: 20px;
-        margin: 0;
-        background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
 
-      /* 标题样式 */
-      h1 {
-        font-size: 3.5rem;
-        font-weight: 800;
-        color: #2c3e50;
-        margin-bottom: 1rem;
-        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        position: relative;
-        animation: fadeInDown 1s ease-out;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Magazine Archive</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" />
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+    /* 全局样式 */
+    body {
+      font-family: "Montserrat", sans-serif;
+      background: linear-gradient(135deg, #f4f4f9 0%, #e0e0e9 100%);
+      padding: 20px;
+      margin: 0;
+      background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
 
-      h1::after {
-        content: "";
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(to right, #3498db, #2980b9);
-        border-radius: 2px;
-      }
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      animation: fadeInDown 1s ease-out;
+    }
 
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-50px);
-        }
+    h1::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, #3498db, #2980b9);
+      border-radius: 2px;
+    }
 
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* 搜索框样式 */
-      .search-container {
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        max-width: 600px;
-        position: relative;
-        animation: slideInUp 1s ease-out;
-      }
-
-      @keyframes slideInUp {
-        from {
-          opacity: 0;
-          transform: translateY(50px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .search-input {
-        width: 100%;
-        padding: 15px 20px;
-        font-size: 1rem;
-        border: 2px solid #3498db;
-        border-radius: 25px;
-        outline: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding-right: 40px;
-      }
-
-      .search-input:focus {
-        border-color: #2980b9;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.2rem;
-        color: #3498db;
-        pointer-events: none;
-      }
-
-      /* 无序列表样式 */
-      ul {
-        list-style-type: none;
-        padding: 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        max-width: 1200px;
-        width: 90%;
-      }
-
-      /* 列表项样式 */
-      li {
-        perspective: 1000px;
-      }
-
-      /* 链接样式 */
-      a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        background-color: #ffffff;
-        color: #333;
-        text-decoration: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        transform-style: preserve-3d;
-      }
-
-      a::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: rgba(255, 255, 255, 0.2);
-        transform: rotate(45deg);
+    @keyframes fadeInDown {
+      from {
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transform: translateY(-50px);
       }
 
-      a:hover {
-        transform: translateY(-10px) scale(1.05) rotateX(10deg);
-        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
-        background: linear-gradient(to bottom right, #3498db, #2980b9);
-        color: white;
-      }
-
-      a:hover::before {
+      to {
         opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .search-container {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border: 2px solid #3498db;
+      border-radius: 25px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-input:focus {
+      border-color: #2980b9;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      width: 90%;
+    }
+
+    li {
+      perspective: 1000px;
+    }
+
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-color: #ffffff;
+      color: #333;
+      text-decoration: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    a::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    a:hover {
+      transform: translateY(-10px) scale(1.05) rotateX(10deg);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(to bottom right, #3498db, #2980b9);
+      color: white;
+    }
+
+    a:hover::before {
+      opacity: 1;
+    }
+
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    a:hover .icon {
+      color: white;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .upload-form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .custom-file-label {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    #fileinp {
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    #btn {
+      background-color: #2ecc71;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 18px;
+      font-family: "Montserrat", sans-serif;
+    }
+
+    #btn:hover {
+      background-color: #27ae60;
+    }
+
+    .upload-form input[type="submit"] {
+      background-color: #3498db;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 18px;
+      font-family: "Montserrat", sans-serif;
+    }
+
+    .upload-form input[type="submit"]:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .key-container {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .key-option {
+      background-color: #f0f0f0;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .key-option:hover {
+      background-color: #e0e0e0;
+    }
+
+    .key-option.selected {
+      background-color: #3498db;
+      color: white;
+    }
+
+    /* 新增样式 */
+    .pdf-link::after {
+      content: attr(data-file-count);
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(52, 152, 219, 0.9);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
       }
 
-      /* 链接内部图标样式 */
-      .icon {
-        font-size: 3.5rem;
-        margin-bottom: 1.5rem;
-        transition: color 0.3s ease;
+      .search-container {
+        max-width: 90%;
       }
 
-      a:hover .icon {
-        color: white;
+      ul {
+        grid-template-columns: 1fr;
       }
 
-      /* 链接内部文字样式 */
-      .title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        text-align: center;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+      .pdf-link::after {
+        top: 10px;
+        right: 10px;
+        font-size: 0.7rem;
       }
-    </style>
-  </head>
+    }
+  </style>
+</head>
 
-  <body>
-    <h1>Archive</h1>
-    <div class="search-container">
-      <input
-        type="text"
-        id="search-input"
-        class="search-input"
-        placeholder="Search for a magazine..."
-      />
-      <i class="search-icon fa-solid fa-magnifying-glass"></i>
-    </div>
-    <ul id="pdf-list"></ul>
+<body>
+  <h1>Archive</h1>
+  <div class="search-container">
+    <input type="text" id="search-input" class="search-input" placeholder="Search for a magazine..." />
+  </div>
+  <ul id="pdf-list"></ul>
 
-    <script>
-      function get_file_icon_class(file) {
-        const ext = file.split(".").pop().toLowerCase();
-        switch (ext) {
-          case "pdf":
-            return "fa-solid fa-file-pdf";
-          case "docx":
-            return "fa-solid fa-file-word";
-          case "xlsx":
-            return "fa-solid fa-file-excel";
-          case "pptx":
-            return "fa-solid fa-file-powerpoint";
-          default:
-            return "fa-solid fa-file";
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+  <script>
+
+    // 静态定义PDF文件列表
+    const pdfFiles = [
+      'Artforum 02 2025.pdf',
+      'Canadian Living 03 2025.pdf',
+      'Computeractive 12 02 2025.pdf',
+      'FORTUNE EU 02 03 2025.pdf',
+      'Ideal Home UK 03 2025§§§§1.pdf',
+      'Ideal Home UK 03 2025§§§§2.pdf',
+      'Ideal Home UK 03 2025§§§§3.pdf',
+      'Kitchen Bath Design News 01 02 2025.pdf',
+      'Model Airplane News 03 04 2025.pdf',
+      'Sports Illustrated National Champions Commemorative 2025.pdf'
+    ];
+
+    // 文件分组逻辑
+    function groupFiles(files) {
+      const groups = {};
+      files.forEach(file => {
+        const baseName = file.split('§§§§')[0].replace(/\.pdf$/, '');
+        if (!groups[baseName]) {
+          groups[baseName] = [];
         }
-      }
+        groups[baseName].push(file);
+      });
+      return groups;
+    }
 
-      function get_file_icon_color(file) {
-        const ext = file.split(".").pop().toLowerCase();
-        switch (ext) {
-          case "pdf":
-            return "#e74c3c";
-          case "docx":
-            return "#2ecc71";
-          case "xlsx":
-            return "#f1c40f";
-          case "pptx":
-            return "#3498db";
-          default:
-            return "#95a5a6";
+    // 生成列表项
+    function renderPDFList() {
+      const pdfList = document.getElementById('pdf-list');
+      const fileGroups = groupFiles(pdfFiles);
+
+      Object.entries(fileGroups).forEach(([baseName, files]) => {
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+
+        // 设置链接属性
+        link.href = `./static/uploads/${files[0]}`;
+        link.className = 'pdf-link';
+        link.dataset.files = files.join(',');
+        link.dataset.base = baseName;
+        link.dataset.fileCount = `${files.length} part${files.length > 1 ? 's' : ''}`;
+
+        // 创建图标
+        const icon = document.createElement('i');
+        icon.className = getFileIconClass(files[0]);
+        icon.style.color = getFileIconColor(files[0]);
+        icon.classList.add('icon');
+
+        // 创建标题
+        const title = document.createElement('span');
+        title.className = 'title';
+        title.textContent = baseName;
+
+        // 组装元素
+        link.appendChild(icon);
+        link.appendChild(title);
+        li.appendChild(link);
+        pdfList.appendChild(li);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const searchInput = document.getElementById('search-input');
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get("search") || "";
+            searchInput.value = searchQuery;
+
+            // 搜索功能
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('#pdf-list .title').forEach(title => {
+                    const item = title.closest('li');
+                    if (title.textContent.toLowerCase().includes(query)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+      renderPDFList();
+
+      // 使用事件委托处理点击事件
+      document.getElementById('pdf-list').addEventListener('click', async (e) => {
+        const link = e.target.closest('.pdf-link');
+        if (!link) return;
+        e.preventDefault();
+
+        const files = link.dataset.files.split(',');
+        const baseName = link.dataset.base;
+
+        try {
+          const { PDFDocument } = PDFLib;
+          const mergedPdf = await PDFDocument.create();
+          let hasValidFiles = false;
+
+          Swal.fire({
+            title: 'Verifying Files',
+            html: `Checking PDF files...`,
+            didOpen: () => Swal.showLoading()
+          });
+
+          // 改进的合并流程
+          for (const file of files) {
+            try {
+              const pdfUrl = `./static/uploads/${file}`;
+              const response = await fetch(pdfUrl);
+
+
+              if (!response.ok) throw new Error(`HTTP error! status: ${response.status} ${pdfUrl}`);
+
+              const pdfBytes = await response.arrayBuffer();
+
+              const header = new Uint8Array(pdfBytes.slice(0, 5));
+              if (String.fromCharCode(...header) !== '%PDF-') {
+                throw new Error('Invalid PDF header');
+              }
+
+              const pdfDoc = await PDFDocument.load(pdfBytes);
+
+              const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+              pages.forEach(page => mergedPdf.addPage(page));
+
+              hasValidFiles = true;
+            } catch (error) {
+              console.error(`Error processing ${file}:`, error);
+              await Swal.fire({
+                icon: 'error',
+                title: 'Invalid PDF',
+                html: `<b>${file}</b> is not a valid PDF file${error}`,
+                confirmButtonColor: '#3498db'
+              });
+              return;
+            }
+          }
+
+          if (!hasValidFiles) {
+            throw new Error('No valid PDF files to merge');
+          }
+
+          Swal.fire({
+            title: 'Finalizing',
+            html: `Generating merged PDF...`,
+            didOpen: () => Swal.showLoading()
+          });
+
+          const mergedPdfBytes = await mergedPdf.save();
+          const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+
+          Swal.close();
+          window.open(url, '_blank').document.title = baseName;
+
+        } catch (error) {
+          console.error('Merge error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Merge Failed',
+            // html: `Error: ${error.message || 'Unknown error'}`,
+            confirmButtonColor: '#3498db'
+          });
         }
+      });
+    });
+
+
+    function handleFileSelection() {
+      const fileInput = document.getElementById('fileinp');
+      const keyContainer = document.getElementById('keyContainer');
+      const uploadButton = document.querySelector('input[type="submit"]');
+
+      if (fileInput.files && fileInput.files.length > 0) {
+        keyContainer.style.display = 'flex';
+        const keys = JSON.parse('{{ keys | tojson }}');
+        keyContainer.innerHTML = '';
+        keys.forEach(key => {
+          const keyOption = document.createElement('div');
+          keyOption.classList.add('key-option');
+          keyOption.textContent = key;
+          keyOption.addEventListener('click', function () {
+            const selected = document.querySelector('.key-option.selected');
+            if (selected) {
+              selected.classList.remove('selected');
+            }
+            this.classList.add('selected');
+            document.getElementById('selectedKey').value = this.textContent;
+            if (fileInput.files && fileInput.files.length > 0 && document.getElementById('selectedKey').value) {
+              uploadButton.disabled = false;
+            }
+          });
+          keyContainer.appendChild(keyOption);
+        });
+      } else {
+        keyContainer.style.display = 'none';
+        uploadButton.disabled = true;
+        document.getElementById('selectedKey').value = '';
       }
+    }
 
-      const pdfFiles = [
-        "Artforum 02 2025.pdf",
-        "Canadian Living 03 2025.pdf",
-        "Computeractive 12 02 2025.pdf",
-        "FORTUNE EU 02 03 2025.pdf",
-        "Ideal Home UK 03 2025.pdf",
-        "Kitchen Bath Design News 01 02 2025.pdf",
-        "Model Airplane News 03 04 2025.pdf",
-        "Sports Illustrated National Champions Commemorative 2025.pdf",
-      ];
-
-      const pdfList = document.getElementById("pdf-list");
-      const searchInput = document.getElementById("search-input");
-
-      // 从 URL 获取搜索参数
-      const urlParams = new URLSearchParams(window.location.search);
-      const searchQuery = urlParams.get("search") || "";
-
-      // 设置搜索框的初始值
-      searchInput.value = searchQuery;
-
-      // 过滤并显示 PDF 文件
-      function filterAndDisplayPDFs(query) {
-        pdfList.innerHTML = ""; // 清空当前列表
-
-        const filteredFiles = pdfFiles.filter((file) =>
-          file.toLowerCase().includes(query.toLowerCase())
-        );
-
-        filteredFiles.forEach((file) => {
-          const listItem = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = `./static/uploads/${file}`;
-          link.target = "_blank";
-
-          const icon = document.createElement("i");
-          icon.className = `icon ${get_file_icon_class(file)}`;
-          icon.style.color = get_file_icon_color(file);
-
-          const title = document.createElement("span");
-          title.className = "title";
-          title.textContent = file;
-
-          link.appendChild(icon);
-          link.appendChild(title);
-          listItem.appendChild(link);
-          pdfList.appendChild(listItem);
+    const uploadForm = document.getElementById('uploadForm');
+    uploadForm.addEventListener('submit', function (e) {
+      const selectedKey = document.getElementById('selectedKey').value;
+      if (!selectedKey) {
+        e.preventDefault();
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Please select a key.',
+          confirmButtonColor: '#3498db'
         });
       }
+    });
 
-      // 初始加载时根据 URL 参数过滤
-      filterAndDisplayPDFs(searchQuery);
+    // 图标处理函数
+    function getFileIconClass(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      return {
+        'pdf': 'fa-solid fa-file-pdf',
+        'docx': 'fa-solid fa-file-word',
+        'xlsx': 'fa-solid fa-file-excel',
+        'pptx': 'fa-solid fa-file-powerpoint'
+      }[ext] || 'fa-solid fa-file';
+    }
 
-      // 监听搜索框输入事件
-      searchInput.addEventListener("input", (e) => {
-        filterAndDisplayPDFs(e.target.value);
-      });
-    </script>
-  </body>
+    function getFileIconColor(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      return {
+        'pdf': '#e74c3c',
+        'docx': '#2ecc71',
+        'xlsx': '#f1c40f',
+        'pptx': '#3498db'
+      }[ext] || '#95a5a6';
+    }
+  </script>
+</body>
+
 </html>
