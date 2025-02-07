@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
         /* 全局样式 */
         body {
@@ -23,7 +24,6 @@
             min-height: 100vh;
         }
 
-        /* 标题样式 */
         h1 {
             font-size: 3.5rem;
             font-weight: 800;
@@ -58,7 +58,6 @@
             }
         }
 
-        /* 搜索框样式 */
         .search-container {
             margin-bottom: 2rem;
             display: flex;
@@ -84,7 +83,6 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* 无序列表样式 */
         ul {
             list-style-type: none;
             padding: 0;
@@ -95,12 +93,10 @@
             width: 90%;
         }
 
-        /* 列表项样式 */
         li {
             perspective: 1000px;
         }
 
-        /* 链接样式 */
         a {
             display: flex;
             flex-direction: column;
@@ -142,7 +138,6 @@
             opacity: 1;
         }
 
-        /* 链接内部图标样式 */
         .icon {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -153,7 +148,6 @@
             color: white;
         }
 
-        /* 链接内部文字样式 */
         .title {
             font-size: 1.2rem;
             font-weight: 600;
@@ -162,7 +156,6 @@
             overflow-wrap: break-word;
         }
 
-        /* 文件上传表单样式 */
         .upload-form {
             background: white;
             padding: 20px;
@@ -174,7 +167,6 @@
             align-items: center;
         }
 
-        /* 自定义文件选择按钮样式 */
         .custom-file-label {
             position: relative;
             display: inline-block;
@@ -208,7 +200,6 @@
             background-color: #27ae60;
         }
 
-        /* 上传按钮样式 */
         .upload-form input[type="submit"] {
             background-color: #3498db;
             color: white;
@@ -221,17 +212,11 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        .upload-form input[type="submit"]:hover {
-            background-color: #2980b9;
-        }
-
-        /* 禁用状态下的上传按钮样式 */
         .upload-form input[type="submit"]:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
 
-        /* 密钥选择样式 */
         .key-container {
             display: none;
             flex-wrap: wrap;
@@ -256,13 +241,50 @@
             background-color: #3498db;
             color: white;
         }
+
+        /* 新增样式 */
+        .pdf-link::after {
+            display: attr(data-file-count);
+            /* 当data-file-count为空时不显示 */
+            content: attr(data-file-count);
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-container {
+                max-width: 90%;
+            }
+
+            ul {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-link::after {
+                top: 10px;
+                right: 10px;
+                font-size: 0.7rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <form class="upload-form" id="uploadForm" method="post" enctype="multipart/form-data">
         <label class="custom-file-label">
-            <input id="fileinp" title="upload pdf" type="file" name="file" accept=".pdf" onchange="handleFileSelection()">
+            <input id="fileinp" title="upload pdf" type="file" name="file" accept=".pdf"
+                onchange="handleFileSelection()">
             <input type="button" id="btn" value="Select File">
         </label>
         <input type="hidden" id="selectedKey" name="selectedKey">
@@ -276,11 +298,13 @@
         <input type="text" id="search-input" class="search-input" placeholder="Search for a magazine...">
     </div>
     <ul id="pdf-list">
-        {% for file in uploaded_files %}
+        {% for base_name, files in file_groups.items() %}
         <li>
-            <a href="{{ url_for('static', filename='uploads/' + file) }}" target="_blank" class="pdf-link">
-                <i class="{{ get_file_icon_class(file) }} icon" style="color: {{ get_file_icon_color(file) }};"></i>
-                <span class="title">{{ file.rsplit('.', 1)[0] }}</span>
+            <a href="#" class="pdf-link" data-files="{{ files | join(',') }}" data-base="{{ base_name }}"
+                data-file-count="{{ files | length }} part{{ '' if files | length == 1 else 's' }}">
+                <i class="{{ get_file_icon_class(files[0]) }} icon"
+                    style="color: {{ get_file_icon_color(files[0]) }};"></i>
+                <span class="title">{{ base_name }}</span>
             </a>
         </li>
         {% endfor %}
@@ -289,32 +313,108 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const error = "{{ error }}";
-            if (error && error != "None") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: error,
-                    confirmButtonColor: '#3498db'
-                });
-            }
-
-            // 从 URL 获取搜索参数
+            const searchInput = document.getElementById('search-input');
             const urlParams = new URLSearchParams(window.location.search);
             const searchQuery = urlParams.get("search") || "";
-
-            // 设置搜索框的初始值
-            const searchInput = document.getElementById('search-input');
             searchInput.value = searchQuery;
 
-            // 初始加载时根据 URL 参数过滤
-            filterAndDisplayPDFs(searchQuery);
-
-            // 监听搜索框输入事件
+            // 搜索功能
             searchInput.addEventListener('input', (e) => {
-                filterAndDisplayPDFs(e.target.value);
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('#pdf-list .title').forEach(title => {
+                    const item = title.closest('li');
+                    if (title.textContent.toLowerCase().includes(query)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // PDF合并预览功能
+
+
+            document.querySelectorAll('.pdf-link').forEach(link => {
+                link.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const files = link.dataset.files.split(',');
+                    const baseName = link.dataset.base;
+
+                    try {
+                        const { PDFDocument } = PDFLib;
+                        const mergedPdf = await PDFDocument.create();
+                        let hasValidFiles = false;
+
+                        Swal.fire({
+                            title: 'Verifying Files',
+                            html: `Checking PDF files...`,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        // 改进的合并流程
+                        for (const file of files) {
+                            try {
+                                const pdfUrl = "{{ url_for('static', filename='uploads/') }}" + file;
+                                const response = await fetch(pdfUrl);
+                                
+
+                                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                                const pdfBytes = await response.arrayBuffer();
+
+                                const header = new Uint8Array(pdfBytes.slice(0, 5));
+                                if (String.fromCharCode(...header) !== '%PDF-') {
+                                    throw new Error('Invalid PDF header');
+                                }
+
+                                const pdfDoc = await PDFDocument.load(pdfBytes);
+
+                                const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                                pages.forEach(page => mergedPdf.addPage(page));
+
+                                hasValidFiles = true;
+                            } catch (error) {
+                                console.error(`Error processing ${file}:`, error);
+                                await Swal.fire({
+                                    icon: 'error',
+                                    title: 'Invalid PDF',
+                                    html: `<b>${file}</b> is not a valid PDF file${error}`,
+                                    confirmButtonColor: '#3498db'
+                                });
+                                return;
+                            }
+                        }
+
+                        if (!hasValidFiles) {
+                            throw new Error('No valid PDF files to merge');
+                        }
+
+                        Swal.fire({
+                            title: 'Finalizing',
+                            html: `Generating merged PDF...`,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        const mergedPdfBytes = await mergedPdf.save();
+                        const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+                        const url = URL.createObjectURL(blob);
+
+                        Swal.close();
+                        window.open(url, '_blank').document.title = baseName;
+
+                    } catch (error) {
+                        console.error('Merge error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Merge Failed',
+                            html: `Error: ${error.message || 'Unknown error'}`,
+                            confirmButtonColor: '#3498db'
+                        });
+                    }
+                });
             });
         });
+
 
         function handleFileSelection() {
             const fileInput = document.getElementById('fileinp');
@@ -362,21 +462,6 @@
                 });
             }
         });
-
-        // 过滤并显示 PDF 文件
-        function filterAndDisplayPDFs(query) {
-            const pdfList = document.getElementById('pdf-list');
-            const pdfLinks = document.querySelectorAll('.pdf-link');
-
-            pdfLinks.forEach(link => {
-                const title = link.querySelector('.title').textContent.toLowerCase();
-                if (title.includes(query.toLowerCase())) {
-                    link.parentElement.style.display = 'block';
-                } else {
-                    link.parentElement.style.display = 'none';
-                }
-            });
-        }
 
         function get_file_icon_class(file) {
             const ext = file.split('.').pop().toLowerCase();
