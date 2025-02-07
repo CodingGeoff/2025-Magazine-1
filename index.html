@@ -287,26 +287,25 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
   <script>
-
     // 静态定义PDF文件列表
     const pdfFiles = [
-      'Artforum 02 2025.pdf',
-      'Canadian Living 03 2025.pdf',
-      'Computeractive 12 02 2025.pdf',
-      'FORTUNE EU 02 03 2025.pdf',
-      'Ideal Home UK 03 2025§§§§1.pdf',
-      'Ideal Home UK 03 2025§§§§2.pdf',
-      'Ideal Home UK 03 2025§§§§3.pdf',
-      'Kitchen Bath Design News 01 02 2025.pdf',
-      'Model Airplane News 03 04 2025.pdf',
-      'Sports Illustrated National Champions Commemorative 2025.pdf'
+      "Artforum 02 2025.pdf",
+      "Canadian Living 03 2025.pdf",
+      "Computeractive 12 02 2025.pdf",
+      "FORTUNE EU 02 03 2025.pdf",
+      "Ideal Home UK 03 2025§§§§1.pdf",
+      "Ideal Home UK 03 2025§§§§2.pdf",
+      "Ideal Home UK 03 2025§§§§3.pdf",
+      "Kitchen Bath Design News 01 02 2025.pdf",
+      "Model Airplane News 03 04 2025.pdf",
+      "Sports Illustrated National Champions Commemorative 2025.pdf",
     ];
 
     // 文件分组逻辑
     function groupFiles(files) {
       const groups = {};
-      files.forEach(file => {
-        const baseName = file.split('§§§§')[0].replace(/\.pdf$/, '');
+      files.forEach((file) => {
+        const baseName = file.split("§§§§")[0].replace(/\.pdf$/, "");
         if (!groups[baseName]) {
           groups[baseName] = [];
         }
@@ -317,29 +316,30 @@
 
     // 生成列表项
     function renderPDFList() {
-      const pdfList = document.getElementById('pdf-list');
+      const pdfList = document.getElementById("pdf-list");
       const fileGroups = groupFiles(pdfFiles);
 
       Object.entries(fileGroups).forEach(([baseName, files]) => {
-        const li = document.createElement('li');
-        const link = document.createElement('a');
+        const li = document.createElement("li");
+        const link = document.createElement("a");
 
         // 设置链接属性
         link.href = `./static/uploads/${files[0]}`;
-        link.className = 'pdf-link';
-        link.dataset.files = files.join(',');
+        link.className = "pdf-link";
+        link.dataset.files = files.join(",");
         link.dataset.base = baseName;
-        link.dataset.fileCount = `${files.length} part${files.length > 1 ? 's' : ''}`;
+        link.dataset.fileCount = `${files.length} part${files.length > 1 ? "s" : ""
+          }`;
 
         // 创建图标
-        const icon = document.createElement('i');
+        const icon = document.createElement("i");
         icon.className = getFileIconClass(files[0]);
         icon.style.color = getFileIconColor(files[0]);
-        icon.classList.add('icon');
+        icon.classList.add("icon");
 
         // 创建标题
-        const title = document.createElement('span');
-        title.className = 'title';
+        const title = document.createElement("span");
+        title.className = "title";
         title.textContent = baseName;
 
         // 组装元素
@@ -350,178 +350,208 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("search-input");
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get("search") || "";
+      searchInput.value = searchQuery;
 
-      const searchInput = document.getElementById('search-input');
-            const urlParams = new URLSearchParams(window.location.search);
-            const searchQuery = urlParams.get("search") || "";
-            searchInput.value = searchQuery;
-
-            // 搜索功能
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
-                document.querySelectorAll('#pdf-list .title').forEach(title => {
-                    const item = title.closest('li');
-                    if (title.textContent.toLowerCase().includes(query)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            });
+      // 搜索功能
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll("#pdf-list .title").forEach((title) => {
+          const item = title.closest("li");
+          if (title.textContent.toLowerCase().includes(query)) {
+            item.style.display = "block";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      });
 
       renderPDFList();
 
-      // 使用事件委托处理点击事件
-      document.getElementById('pdf-list').addEventListener('click', async (e) => {
-        const link = e.target.closest('.pdf-link');
-        if (!link) return;
-        e.preventDefault();
+      document
+        .getElementById("pdf-list")
+        .addEventListener("click", async (e) => {
+          const link = e.target.closest(".pdf-link");
+          if (!link) return;
+          e.preventDefault();
 
-        const files = link.dataset.files.split(',');
-        const baseName = link.dataset.base;
+          const files = link.dataset.files.split(",");
+          const baseName = link.dataset.base;
 
-        try {
-          const { PDFDocument } = PDFLib;
-          const mergedPdf = await PDFDocument.create();
-          let hasValidFiles = false;
+          try {
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+            let validFiles = []; // Store successfully loaded files
+            let loadedCount = 0; // Track loaded files
 
-          Swal.fire({
-            title: 'Verifying Files',
-            html: `Checking PDF files...`,
-            didOpen: () => Swal.showLoading()
-          });
+            Swal.fire({
+              title: "Verifying Files",
+              html: `Checking PDF files ${baseName}...`,
+              allowOutsideClick: false, // Prevent closing while loading
+              didOpen: () => Swal.showLoading(),
+            });
 
-          // 改进的合并流程
-          for (const file of files) {
-            try {
-              const pdfUrl = `./static/uploads/${file}`;
-              const response = await fetch(pdfUrl);
-
-
-              if (!response.ok) throw new Error(`HTTP error! status: ${response.status} ${pdfUrl}`);
-
-              const pdfBytes = await response.arrayBuffer();
-
-              const header = new Uint8Array(pdfBytes.slice(0, 5));
-              if (String.fromCharCode(...header) !== '%PDF-') {
-                throw new Error('Invalid PDF header');
+            const loadFile = async (file) => {
+              try {
+                const pdfUrl = `./static/uploads/${file}`;
+                const response = await fetch(pdfUrl);
+                if (!response.ok)
+                  throw new Error(
+                    `HTTP error! status: ${response.status}`
+                  );
+                const pdfBytes = await response.arrayBuffer();
+                const header = new Uint8Array(pdfBytes.slice(0, 5));
+                if (String.fromCharCode(...header) !== "%PDF-") {
+                  throw new Error("Invalid PDF header");
+                }
+                const pdfDoc = await PDFDocument.load(pdfBytes);
+                const pages = await mergedPdf.copyPages(
+                  pdfDoc,
+                  pdfDoc.getPageIndices()
+                );
+                pages.forEach((page) => mergedPdf.addPage(page));
+                validFiles.push(file);
+                loadedCount++;
+                Swal.update({
+                  html: `Loaded ${loadedCount} part${loadedCount > 1 ? "s" : ""
+                    } of ${files.length} for ${baseName}...`,
+                });
+                return true; // Success
+              } catch (error) {
+                console.error(`Error loading ${file}:`, error);
+                return false; // Failure
               }
+            };
 
-              const pdfDoc = await PDFDocument.load(pdfBytes);
-
-              const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-              pages.forEach(page => mergedPdf.addPage(page));
-
-              hasValidFiles = true;
-            } catch (error) {
-              console.error(`Error processing ${file}:`, error);
-              await Swal.fire({
-                icon: 'error',
-                title: 'Invalid PDF',
-                html: `<b>${file}</b> is not a valid PDF file${error}`,
-                confirmButtonColor: '#3498db'
+            // Load files sequentially with a timeout for each
+            const loadWithTimeout = (file, timeout) => {
+              return new Promise((resolve) => {
+                const timer = setTimeout(() => {
+                  console.warn(`Timeout loading ${file}`);
+                  resolve(false); // Timeout treated as failure
+                }, timeout);
+                loadFile(file).then((result) => {
+                  clearTimeout(timer);
+                  resolve(result);
+                });
               });
-              return;
+            };
+
+            const timeout = 20000; // 20 seconds timeout per file
+            for (const file of files) {
+              const success = await loadWithTimeout(file, timeout);
+              if (!success) {
+                Swal.fire({
+                  icon: "warning",
+                  title: "Partial Load",
+                  text: `Some parts of ${baseName} could not be loaded. Displaying available parts.`,
+                  confirmButtonColor: "#3498db",
+                });
+                break; // Exit the loop if a file times out
+              }
             }
+
+            if (validFiles.length === 0) {
+              throw new Error("No valid PDF files to merge");
+            }
+
+            const mergedPdfBytes = await mergedPdf.save();
+            const blob = new Blob([mergedPdfBytes], {
+              type: "application/pdf",
+            });
+            const url = URL.createObjectURL(blob);
+
+            Swal.close();
+            window.open(url, "_blank").document.title = baseName;
+          } catch (error) {
+            console.error("Merge error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Load Failed",
+              text: error.message || "An error occurred during loading.",
+              confirmButtonColor: "#3498db",
+            });
           }
-
-          if (!hasValidFiles) {
-            throw new Error('No valid PDF files to merge');
-          }
-
-          Swal.fire({
-            title: 'Finalizing',
-            html: `Generating merged PDF...`,
-            didOpen: () => Swal.showLoading()
-          });
-
-          const mergedPdfBytes = await mergedPdf.save();
-          const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
-
-          Swal.close();
-          window.open(url, '_blank').document.title = baseName;
-
-        } catch (error) {
-          console.error('Merge error:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Merge Failed',
-            // html: `Error: ${error.message || 'Unknown error'}`,
-            confirmButtonColor: '#3498db'
-          });
-        }
-      });
+        });
     });
 
-
     function handleFileSelection() {
-      const fileInput = document.getElementById('fileinp');
-      const keyContainer = document.getElementById('keyContainer');
+      const fileInput = document.getElementById("fileinp");
+      const keyContainer = document.getElementById("keyContainer");
       const uploadButton = document.querySelector('input[type="submit"]');
 
       if (fileInput.files && fileInput.files.length > 0) {
-        keyContainer.style.display = 'flex';
-        const keys = JSON.parse('{{ keys | tojson }}');
-        keyContainer.innerHTML = '';
-        keys.forEach(key => {
-          const keyOption = document.createElement('div');
-          keyOption.classList.add('key-option');
+        keyContainer.style.display = "flex";
+        const keys = JSON.parse("{{ keys | tojson }}");
+        keyContainer.innerHTML = "";
+        keys.forEach((key) => {
+          const keyOption = document.createElement("div");
+          keyOption.classList.add("key-option");
           keyOption.textContent = key;
-          keyOption.addEventListener('click', function () {
-            const selected = document.querySelector('.key-option.selected');
+          keyOption.addEventListener("click", function () {
+            const selected = document.querySelector(".key-option.selected");
             if (selected) {
-              selected.classList.remove('selected');
+              selected.classList.remove("selected");
             }
-            this.classList.add('selected');
-            document.getElementById('selectedKey').value = this.textContent;
-            if (fileInput.files && fileInput.files.length > 0 && document.getElementById('selectedKey').value) {
+            this.classList.add("selected");
+            document.getElementById("selectedKey").value = this.textContent;
+            if (
+              fileInput.files &&
+              fileInput.files.length > 0 &&
+              document.getElementById("selectedKey").value
+            ) {
               uploadButton.disabled = false;
             }
           });
           keyContainer.appendChild(keyOption);
         });
       } else {
-        keyContainer.style.display = 'none';
+        keyContainer.style.display = "none";
         uploadButton.disabled = true;
-        document.getElementById('selectedKey').value = '';
+        document.getElementById("selectedKey").value = "";
       }
     }
 
-    const uploadForm = document.getElementById('uploadForm');
-    uploadForm.addEventListener('submit', function (e) {
-      const selectedKey = document.getElementById('selectedKey').value;
+    const uploadForm = document.getElementById("uploadForm");
+    uploadForm.addEventListener("submit", function (e) {
+      const selectedKey = document.getElementById("selectedKey").value;
       if (!selectedKey) {
         e.preventDefault();
         Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Please select a key.',
-          confirmButtonColor: '#3498db'
+          icon: "error",
+          title: "Oops...",
+          text: "Please select a key.",
+          confirmButtonColor: "#3498db",
         });
       }
     });
 
     // 图标处理函数
     function getFileIconClass(filename) {
-      const ext = filename.split('.').pop().toLowerCase();
-      return {
-        'pdf': 'fa-solid fa-file-pdf',
-        'docx': 'fa-solid fa-file-word',
-        'xlsx': 'fa-solid fa-file-excel',
-        'pptx': 'fa-solid fa-file-powerpoint'
-      }[ext] || 'fa-solid fa-file';
+      const ext = filename.split(".").pop().toLowerCase();
+      return (
+        {
+          pdf: "fa-solid fa-file-pdf",
+          docx: "fa-solid fa-file-word",
+          xlsx: "fa-solid fa-file-excel",
+          pptx: "fa-solid fa-file-powerpoint",
+        }[ext] || "fa-solid fa-file"
+      );
     }
 
     function getFileIconColor(filename) {
-      const ext = filename.split('.').pop().toLowerCase();
-      return {
-        'pdf': '#e74c3c',
-        'docx': '#2ecc71',
-        'xlsx': '#f1c40f',
-        'pptx': '#3498db'
-      }[ext] || '#95a5a6';
+      const ext = filename.split(".").pop().toLowerCase();
+      return (
+        {
+          pdf: "#e74c3c",
+          docx: "#2ecc71",
+          xlsx: "#f1c40f",
+          pptx: "#3498db",
+        }[ext] || "#95a5a6"
+      );
     }
   </script>
 </body>
