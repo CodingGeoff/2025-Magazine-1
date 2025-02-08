@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free magazine archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #c9d8f0 0%, #e0e0e9 100%);
+            background: linear-gradient(135deg, #f4f4f9 0%, #e0e0e9 100%);
             padding: 20px;
             margin: 0;
             background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
@@ -18,14 +19,19 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            background-color: #1f1f2e;
+            /* background-image: url('https://img.freepik.com/free-vector/blue-purple-abstract-background_23-2148812630.jpg?w=2000'); */
+            background-size: cover;
+            background-repeat: no-repeat;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
             font-weight: 800;
-            color: #5a6f8c;
+            color: #f9a8d4;
             margin-bottom: 1rem;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 4px 8px rgba(249, 168, 212, 0.6);
             position: relative;
             animation: fadeInDown 1s ease-out;
         }
@@ -36,10 +42,10 @@
             bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(to right, #83a4d4, #b6fbff);
-            border-radius: 2px;
+            width: 120px;
+            height: 6px;
+            background: linear-gradient(to right, #f9a8d4, #e91e63);
+            border-radius: 3px;
         }
 
         @keyframes fadeInDown {
@@ -47,46 +53,47 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-      .search-container {
+     .search-container {
             margin-bottom: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
         }
 
-      .search-input {
+     .search-input {
             width: 100%;
-            padding: 15px 20px;
-            font-size: 1rem;
-            border: 2px solid #83a4d4;
-            border-radius: 25px;
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            border: 3px solid #f9a8d4;
+            border-radius: 50px;
             outline: none;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #f0f4f9;
+            box-shadow: 0 4px 8px rgba(249, 168, 212, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
-      .search-input:focus {
-            border-color: #b6fbff;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            background-color: #ffffff;
+     .search-input:focus {
+            border-color: #e91e63;
+            box-shadow: 0 6px 12px rgba(233, 30, 99, 0.4);
         }
 
         ul {
             list-style-type: none;
             padding: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1500px;
             width: 90%;
         }
 
@@ -94,64 +101,62 @@
             perspective: 1000px;
         }
 
-      .group-container {
+     .group-container {
             width: 100%;
             overflow-x: auto;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             scrollbar-width: thin;
-            scrollbar-color: #83a4d4 #f0f0f0;
+            scrollbar-color: #f9a8d4 #1f1f2e;
         }
 
-      .scroll-container {
+     .scroll-container {
             display: flex;
-            gap: 1rem;
-            padding: 1rem;
+            gap: 1.5rem;
+            padding: 1.5rem;
             min-width: min-content;
         }
 
-      .group-item {
+     .group-item {
             flex: 0 0 auto;
-            width: 250px;
+            width: 300px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 1.5rem;
-            background-color: #ffffff;
-            color: #333;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
             text-decoration: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(249, 168, 212, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             transform-style: preserve-3d;
-            background: linear-gradient(to bottom, #f0f4f9, #ffffff);
         }
 
-      .group-item:hover {
-            transform: translateY(-10px) scale(1.05) rotateX(10deg);
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
-            background: linear-gradient(to bottom right, #83a4d4, #b6fbff);
+     .group-item:hover {
+            transform: translateY(-15px) scale(1.08) rotateX(15deg);
+            box-shadow: 0 30px 50px rgba(249, 168, 212, 0.5);
+            background: linear-gradient(to bottom right, #f9a8d4, #e91e63);
+        }
+
+     .group-item:hover.icon {
             color: white;
         }
 
-      .group-item:hover.icon {
-            color: white;
-        }
-
-      .group-title {
-            font-size: 1rem;
+     .group-title {
+            font-size: 1.2rem;
             font-weight: 600;
             text-align: center;
-            margin: 0.5rem 0;
+            margin: 0.8rem 0;
         }
 
-      .page-indicator {
-            font-size: 0.8rem;
-            color: #666;
+     .page-indicator {
+            font-size: 1rem;
+            color: #ccc;
         }
 
-      .group-item:hover.page-indicator {
+     .group-item:hover.page-indicator {
             color: white;
         }
 
@@ -161,16 +166,15 @@
             align-items: center;
             justify-content: center;
             padding: 2rem;
-            background-color: #ffffff;
-            color: #333;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
             text-decoration: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(249, 168, 212, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             transform-style: preserve-3d;
-            background: linear-gradient(to bottom, #f0f4f9, #ffffff);
         }
 
         a::before {
@@ -190,14 +194,20 @@
             opacity: 1;
         }
 
-      .icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
+        a:hover {
+            background: linear-gradient(to bottom right, #f9a8d4, #e91e63);
+            box-shadow: 0 30px 50px rgba(249, 168, 212, 0.5);
         }
 
-      .title {
-            font-size: 1.2rem;
+     .icon {
+            font-size: 4rem;
+            margin-bottom: 1.2rem;
+            transition: color 0.3s ease;
+            color: #f9a8d4;
+        }
+
+     .title {
+            font-size: 1.4rem;
             font-weight: 600;
             text-align: center;
             word-wrap: break-word;
@@ -205,8 +215,9 @@
         }
     </style>
 </head>
+
 <body>
-    <h1>Archive</h1>
+    <h1>Free Magazine Archive</h1>
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="Search for a magazine...">
     </div>
@@ -245,7 +256,7 @@
             }
         }
 
-        const pdfFiles =['ADMIN Network Security - 01 02 2025.pdf', 'AppleMagazine - 7 February 2025.pdf', 'Artforum 02 2025.pdf', 'Australian Country Homes I28 2025§§§§1.pdf', 'Australian Country Homes I28 2025§§§§2.pdf', 'Australian Country Homes I28 2025§§§§3.pdf', 'BBC Wildlife Magazine - March 2025.pdf', 'British Archaeology - 03 04 2025.pdf', 'Canadian Living 03 2025.pdf', 'Classic Sports Car 03 2025§§§§1.pdf', 'Classic Sports Car 03 2025§§§§2.pdf', 'Classic Sports Car I18 Italian Legends 2025§§§§1.pdf', 'Classic Sports Car I18 Italian Legends 2025§§§§2.pdf', 'Combat Aircraft 03 2025§§§§1.pdf', 'Combat Aircraft 03 2025§§§§2.pdf', 'Computeractive 12 02 2025.pdf', 'Conde Nast Traveler USA 03 2025.pdf', 'Design Solutions Winter 2025.pdf', 'Discover 03 04 2025.pdf', 'ELLE - UK - March 2025§§§§1.pdf', 'ELLE - UK - March 2025§§§§2.pdf', 'Eureka 02 03 2025.pdf', 'FORTUNE EU 02 03 2025.pdf', 'Guardian Weekly - 7 February 2025.pdf', 'Harvard Business Review USA - January February 2025§§§§1.pdf', 'Harvard Business Review USA - January February 2025§§§§2.pdf', 'Hemmings Motor News 03 2025§§§§1.pdf', 'Hemmings Motor News 03 2025§§§§2.pdf', 'Hemmings Motor News 03 2025§§§§3.pdf', 'Hi-Fi - February 2025§§§§1.pdf', 'Hi-Fi - February 2025§§§§2.pdf', 'History of War Ancient Battles - 1st Edition 2025§§§§1.pdf', 'History of War Ancient Battles - 1st Edition 2025§§§§2.pdf', 'Hobby Farms 03 04 2025§§§§1.pdf', 'Hobby Farms 03 04 2025§§§§2.pdf', 'Ideal Home UK 03 2025§§§§1.pdf', 'Ideal Home UK 03 2025§§§§2.pdf', 'Ideal Home UK 03 2025§§§§3.pdf', 'In Touch Weekly 02 17 2025.pdf', 'Kitchen Bath Design News 01 02 2025.pdf', 'Learn Hot English - Issue 273 2025.pdf', 'Linux USA 03 2025.pdf', 'Luxury Holiday Destinations - 1st Edition 2025.pdf', 'Men s Fitness UK - Get A Six Pack In 8 Weeks 2025.pdf', 'Military Heritage - Winter 2025§§§§1.pdf', 'Military Heritage - Winter 2025§§§§2.pdf', 'Model Airplane News 03 04 2025.pdf', 'MoneyWeek - 7 02 2025.pdf', 'National Geographic Traveller Spa Wellness 2025§§§§1.pdf', 'National Geographic Traveller Spa Wellness 2025§§§§2.pdf', 'National Geographic Traveller UK - March 2025§§§§1.pdf', 'National Geographic Traveller UK - March 2025§§§§2.pdf', 'New Scientist Int 8 02 2025.pdf', 'Newsweek USA 02 14 2025.pdf', 'Outlook Business - February 2025.pdf', 'People USA 02 17 2025.pdf', 'Popular Woodworking 03 04 2025.pdf', 'Practical Wireless 03 2025.pdf', 'Qualified Remodeler 01 02 2025.pdf', 'Racecar Engineering 03 2025.pdf', 'Rolls-Royce Bentley Driver 03 04 2025.pdf', 'Southern Living Container Gardening 2025§§§§1.pdf', 'Southern Living Container Gardening 2025§§§§2.pdf', 'Space - February 2025§§§§1.pdf', 'Space - February 2025§§§§2.pdf', 'Space - February 2025§§§§3.pdf', 'Sports Illustrated National Champions Commemorative 2025.pdf', 'Star USA 02 17 2025.pdf', 'Start Your Own Business - 11th Edition 2025.pdf', 'The New York Review of Books 02 27 2025.pdf', 'The Week UK - Issue 1526 8 February 2025.pdf', 'The Week USA - February 14 2025.pdf', 'Todays Dietitian 02 2025.pdf', 'Understanding Meteorology - 1st Edition 2025.pdf', 'Unique Cars AU I501 2025§§§§1.pdf', 'Unique Cars AU I501 2025§§§§2.pdf', 'Us Weekly 02 17 2025.pdf', 'Vintage Rock I33 The Ultimate 1950s Rock n Roll Companion 2025.pdf', 'Womans World USA 02 17 2025.pdf'];
+        const pdfFiles = ['AppleMagazine - 7 February 2025.pdf', 'Artforum 02 2025.pdf', 'Australian Country Homes I28 2025§§§§1.pdf', 'Australian Country Homes I28 2025§§§§2.pdf', 'Australian Country Homes I28 2025§§§§3.pdf', 'BBC Wildlife Magazine - March 2025.pdf', 'British Archaeology - 03 04 2025.pdf', 'Canadian Living 03 2025.pdf', 'Classic Sports Car 03 2025§§§§1.pdf', 'Classic Sports Car 03 2025§§§§2.pdf', 'Combat Aircraft 03 2025§§§§1.pdf', 'Combat Aircraft 03 2025§§§§2.pdf', 'Computeractive 12 02 2025.pdf', 'Design Solutions Winter 2025.pdf', 'Discover 03 04 2025.pdf', 'Eureka 02 03 2025.pdf', 'FORTUNE EU 02 03 2025.pdf', 'Guardian Weekly - 7 February 2025.pdf', 'Harvard Business Review USA - January February 2025§§§§1.pdf', 'Harvard Business Review USA - January February 2025§§§§2.pdf', 'Hemmings Motor News 03 2025§§§§1.pdf', 'Hemmings Motor News 03 2025§§§§2.pdf', 'Hemmings Motor News 03 2025§§§§3.pdf', 'Hobby Farms 03 04 2025§§§§1.pdf', 'Hobby Farms 03 04 2025§§§§2.pdf', 'Ideal Home UK 03 2025§§§§1.pdf', 'Ideal Home UK 03 2025§§§§2.pdf', 'Ideal Home UK 03 2025§§§§3.pdf', 'In Touch Weekly 02 17 2025.pdf', 'Kitchen Bath Design News 01 02 2025.pdf', 'Model Airplane News 03 04 2025.pdf', 'MoneyWeek - 7 02 2025.pdf', 'National Geographic Traveller UK - March 2025§§§§1.pdf', 'National Geographic Traveller UK - March 2025§§§§2.pdf', 'New Scientist Int 8 02 2025.pdf', 'Newsweek USA 02 14 2025.pdf', 'Outlook Business - February 2025.pdf', 'People USA 02 17 2025.pdf', 'Qualified Remodeler 01 02 2025.pdf', 'Racecar Engineering 03 2025.pdf', 'Rolls - Royce Bentley Driver 03 04 2025.pdf', 'Southern Living Container Gardening 2025§§§§1.pdf', 'Southern Living Container Gardening 2025§§§§2.pdf', 'Space - February 2025§§§§1.pdf', 'Space - February 2025§§§§2.pdf', 'Space - February 2025§§§§3.pdf', 'Sports Illustrated National Champions Commemorative 2025.pdf', 'Star USA 02 17 2025.pdf', 'Start Your Own Business - 11th Edition 2025.pdf', 'The New York Review of Books 02 27 2025.pdf', 'The Week UK - Issue 1526 8 February 2025.pdf', 'The Week USA - February 14 2025.pdf', 'Todays Dietitian 02 2025.pdf', 'Us Weekly 02 17 2025.pdf', 'Womans World USA 02 17 2025.pdf'];
 
         function groupFiles(files) {
             const groups = {};
@@ -344,4 +355,5 @@
         });
     </script>
 </body>
+
 </html>
