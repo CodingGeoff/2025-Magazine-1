@@ -181,11 +181,11 @@ def split_pdf(input_pdf_path, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    # 如果文件大小小于等于100MB，直接复制到输出文件夹
-    if file_size <= 100:
+    # 如果文件大小小于等于80MB，直接复制到输出文件夹
+    if file_size <= 80:
         import shutil
         shutil.copy2(input_pdf_path, output_folder)
-        print(f"文件大小小于等于100MB，已直接复制到 {output_folder}。")
+        print(f"文件大小小于等于80MB，已直接复制到 {output_folder}。")
         return
 
     # 读取PDF文件
